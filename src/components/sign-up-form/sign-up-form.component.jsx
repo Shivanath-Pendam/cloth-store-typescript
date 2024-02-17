@@ -18,7 +18,6 @@ const deafultFormFields = {
 
 const SignUpForm = () => {
     const [formFields, setFormFields] = useState(deafultFormFields);
-
     const { displayName, email, password, confirmPassword } = formFields;
 
     const resetFormFields = () => {
@@ -26,7 +25,7 @@ const SignUpForm = () => {
     }
 
     const handleSubmit = async (event) => {
-        event.PreventDefault();
+        event?.preventDefault();
 
         if (password !== confirmPassword) {
             alert('pasword does not match');
@@ -34,7 +33,10 @@ const SignUpForm = () => {
         }
 
         try {
-            const { user } = await createAuthUserWithEmailAndPassword(email, password);
+            const { user } = await createAuthUserWithEmailAndPassword(
+                email,
+                password
+            );
 
             await createUserDoucmentFromAuth(user, { displayName });
             resetFormFields();
@@ -94,7 +96,7 @@ const SignUpForm = () => {
                     value={confirmPassword}
                 />
 
-                <Button type="submit" > SIGN UP
+                <Button type="submit" > Sign Up
                 </Button>
             </form>
         </div>
