@@ -62,7 +62,7 @@ export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => 
     console.log("Done");
 }
 
-export const getCollectionAndDocuments = async () => {
+export const getCategoriesAndDocuments = async () => {
     const collectionRef = collection(db, 'categories');
     const q = query(collectionRef);
 
@@ -87,9 +87,6 @@ export const createUserDoucmentFromAuth = async (userAuth, additionalInformation
 
     const userSnapshot = await getDoc(userDocRef);
 
-    // console.log(userSnapshot);
-    // console.log(userSnapshot.exists());
-
     if (!userSnapshot.exists()) {
         const { displayName, email } = userAuth;
         const createdAt = new Date();
@@ -106,12 +103,7 @@ export const createUserDoucmentFromAuth = async (userAuth, additionalInformation
         }
     }
 
-    // if user data exists
-    // create / set the doucemnt with hte data from userauth in my collection
-
-    // if user doesnot exist
-
-    return userDocRef;
+    return userSnapshot;
 }
 
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
@@ -130,3 +122,16 @@ export const signOutUser = async () => await signOut(auth);
 
 export const onAuthStateChangedListener = (callback) =>
     onAuthStateChanged(auth, callback)
+
+
+export const getCurrentUser = () => {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(
+            auth,
+            (user) => {
+                unsubscribe();
+                resolve(user);
+            }, reject
+        );
+    })
+}
