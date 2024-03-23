@@ -1,45 +1,37 @@
-import { useState } from 'react';
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 
 import FormInput from '../form-input/form-input.component';
-import Button from '../button/button.component';
-
-import {
-  createAuthUserWithEmailAndPassword,
-  createUserDocumentFromAuth,
-} from '../../utils/firebase/firebase.utils';
-
+import Button from "../button/button.component";
 import { SignUpContainer } from './sign-up-form.styles';
+import { signUpStart } from '../../store/user/user.action';
 
-const defaultFormFields = {
+const deafultFormFields = {
   displayName: '',
   email: '',
   password: '',
-  confirmPassword: '',
-};
+  confirmPassword: ''
+}
 
 const SignUpForm = () => {
-  const [formFields, setFormFields] = useState(defaultFormFields);
+  const dispatch = useDispatch();
+  const [formFields, setFormFields] = useState(deafultFormFields);
   const { displayName, email, password, confirmPassword } = formFields;
 
   const resetFormFields = () => {
-    setFormFields(defaultFormFields);
-  };
+    setFormFields(deafultFormFields);
+  }
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    event?.preventDefault();
 
     if (password !== confirmPassword) {
-      alert('passwords do not match');
+      alert('pasword does not match');
       return;
     }
 
     try {
-      const { user } = await createAuthUserWithEmailAndPassword(
-        email,
-        password
-      );
-
-      await createUserDocumentFromAuth(user, { displayName });
+      dispatch(signUpStart(email, password, displayName));
       resetFormFields();
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
@@ -48,22 +40,22 @@ const SignUpForm = () => {
         console.log('user creation encountered an error', error);
       }
     }
-  };
+
+  }
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-
-    setFormFields({ ...formFields, [name]: value });
-  };
+    setFormFields({ ...formFields, [name]: value })
+  }
 
   return (
     <SignUpContainer>
-      <h2>Don't have an account?</h2>
+      <h2>Don't have account ?</h2>
       <span>Sign up with your email and password</span>
       <form onSubmit={handleSubmit}>
         <FormInput
-          label='Display Name'
-          type='text'
+          label="Display Name"
+          type="text"
           required
           onChange={handleChange}
           name='displayName'
@@ -71,8 +63,8 @@ const SignUpForm = () => {
         />
 
         <FormInput
-          label='Email'
-          type='email'
+          label="Email"
+          type="email"
           required
           onChange={handleChange}
           name='email'
@@ -80,8 +72,8 @@ const SignUpForm = () => {
         />
 
         <FormInput
-          label='Password'
-          type='password'
+          label="Passwod"
+          type="passowrd"
           required
           onChange={handleChange}
           name='password'
@@ -89,17 +81,19 @@ const SignUpForm = () => {
         />
 
         <FormInput
-          label='Confirm Password'
-          type='password'
+          label="Confirm Password"
+          type="password"
           required
           onChange={handleChange}
           name='confirmPassword'
           value={confirmPassword}
         />
-        <Button type='submit'>Sign Up</Button>
+
+        <Button type="submit" > Sign Up
+        </Button>
       </form>
     </SignUpContainer>
   );
-};
+}
 
 export default SignUpForm;

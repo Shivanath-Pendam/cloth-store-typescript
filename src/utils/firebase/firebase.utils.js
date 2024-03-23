@@ -1,4 +1,5 @@
-import { initializeApp } from 'firebase/app';
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
 import {
   getAuth,
   signInWithRedirect,
@@ -7,8 +8,9 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
+  onAuthStateChanged
 } from 'firebase/auth';
+
 import {
   getFirestore,
   doc,
@@ -17,9 +19,12 @@ import {
   collection,
   writeBatch,
   query,
-  getDocs,
+  getDocs
 } from 'firebase/firestore';
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAWHIpbytxvWQR0Un8WcTSfZQ4fJylJubk",
   authDomain: "cloth-store-fb495.firebaseapp.com",
@@ -29,27 +34,22 @@ const firebaseConfig = {
   appId: "1:637214645760:web:cb936fb7f148dec2adc2e5"
 };
 
+// Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 
 const googleProvider = new GoogleAuthProvider();
 
 googleProvider.setCustomParameters({
-  prompt: 'select_account',
+  prompt: "select_account"
 });
 
 export const auth = getAuth();
-export const signInWithGooglePopup = () =>
-  signInWithPopup(auth, googleProvider);
-export const signInWithGoogleRedirect = () =>
-  signInWithRedirect(auth, googleProvider);
+export const signInWithGooglePopup = () => signInWithPopup(auth, googleProvider);
+export const signInWithGoogleRedirect = () => signInWithRedirect(auth, googleProvider);
 
 export const db = getFirestore();
 
-export const addCollectionAndDocuments = async (
-  collectionKey,
-  objectsToAdd,
-  field
-) => {
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
   const collectionRef = collection(db, collectionKey);
   const batch = writeBatch(db);
 
@@ -59,21 +59,28 @@ export const addCollectionAndDocuments = async (
   });
 
   await batch.commit();
-  console.log('done');
-};
+  console.log("Done");
+}
 
 export const getCategoriesAndDocuments = async () => {
   const collectionRef = collection(db, 'categories');
   const q = query(collectionRef);
 
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((docSnapshot) => docSnapshot.data());
-};
+  const querySnapShot = await getDocs(q);
 
-export const createUserDocumentFromAuth = async (
-  userAuth,
-  additionalInformation = {}
-) => {
+  return querySnapShot.docs.map(docSnapshot => docSnapshot.data());
+
+
+  // .reduce((acc, docSnapShot) => {
+  //     const { title, items } = docSnapShot.data();
+  //     acc[title.toLowerCase()] = items;
+  //     return acc;
+  // }, {});
+
+  // return categoriesMap;
+}
+
+export const createUserDoucmentFromAuth = async (userAuth, additionalInformation = {}) => {
   if (!userAuth) return;
 
   const userDocRef = doc(db, 'users', userAuth.uid);
@@ -90,28 +97,41 @@ export const createUserDocumentFromAuth = async (
         email,
         createdAt,
         ...additionalInformation,
-      });
+      })
     } catch (error) {
       console.log('error creating the user', error.message);
     }
   }
 
-  return userDocRef;
-};
+  return userSnapshot;
+}
 
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
   if (!email || !password) return;
 
   return await createUserWithEmailAndPassword(auth, email, password);
-};
+}
 
-export const signInAuthUserWithEmailAndPassword = async (email, password) => {
+export const signInAuthUserwithEmailAndPassword = async (email, password) => {
   if (!email || !password) return;
 
   return await signInWithEmailAndPassword(auth, email, password);
-};
+}
 
 export const signOutUser = async () => await signOut(auth);
 
 export const onAuthStateChangedListener = (callback) =>
-  onAuthStateChanged(auth, callback);
+  onAuthStateChanged(auth, callback)
+
+
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (user) => {
+        unsubscribe();
+        resolve(user);
+      }, reject
+    );
+  })
+}

@@ -1,12 +1,8 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-import {
-  BaseButton,
-  GoogleSignInButton,
-  InvertedButton,
-} from '../button/button.styles';
+import { BaseButton, GoogleSignInButton, InvertedButton } from "../button/button.styles";
 
-export const CartDropdownContainer = styled.div`
+export const CartDropDownCaontainer = styled.div`
   position: absolute;
   width: 240px;
   height: 340px;
@@ -26,7 +22,7 @@ export const CartDropdownContainer = styled.div`
   }
 `;
 
-export const EmptyMessage = styled.span`
+export const EmptyCardMessage = styled.span`
   font-size: 18px;
   margin: 50px auto;
 `;
