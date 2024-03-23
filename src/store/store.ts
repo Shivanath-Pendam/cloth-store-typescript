@@ -1,8 +1,8 @@
-import { compose, legacy_createStore as createStore, applyMiddleware } from "redux";
+import { compose, legacy_createStore as createStore, applyMiddleware, Middleware } from "redux";
 
 import logger from 'redux-logger';
 
-import { persistStore, persistReducer } from 'redux-persist';
+import { persistStore, persistReducer, PersistConfig } from 'redux-persist';
 
 import storage from "redux-persist/lib/storage";
 
@@ -13,21 +13,19 @@ import createSagaMiddleware from "redux-saga";
 import { rootReducer } from "./root-reducer";
 import { rootSaga } from "./root-saga";
 
-// const loggerMiddleware = (store) => (next) => (action) => {
-//     if (!action.type) {
-//         return next(action);
-//     }
+export type RootState = ReturnType<typeof rootReducer>;
 
-//     console.log('type', action.type);
-//     console.log('payload', action.payload);
-//     console.log('currentSate', store.getState());
+declare global {
+  interface Window {
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
+  }
+}
 
-//     next(action);
+type ExtendPersistConfig = PersistConfig<RootState> & {
+  whitelist: (keyof RootState)[]
+};
 
-//     console.log('next state', store.getState());
-// }
-
-const persistConfig = {
+const persistConfig: ExtendPersistConfig = {
   key: 'root',
   storage,
   whitelist: ['cart']
@@ -37,7 +35,11 @@ const sagaMiddleware = createSagaMiddleware();
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const middleWares = [process.env.NODE_ENV !== 'production' && logger, sagaMiddleware].filter(Boolean);
+const middleWares = [
+  process.env.NODE_ENV !== 'production'
+  && logger,
+  sagaMiddleware
+].filter((middleWares): middleWares is Middleware => Boolean(middleWares));
 
 const composeEnhanceer = (
   process.env.NODE_ENV !== 'production'
