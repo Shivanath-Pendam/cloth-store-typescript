@@ -75,7 +75,7 @@ export const emailSignInStart = withMatcher(
         createAction(USER_ACTION_TYPE.EMAIL_SIGN_IN_START, { email, password }));
 
 export const signInSuccess = withMatcher(
-    (user: UserData): SignInSuccess =>
+    (user: UserData & { id: string }): SignInSuccess =>
         createAction(USER_ACTION_TYPE.SIGN_IN_SUCCESS, user));
 
 export const signInFailed = withMatcher(
